@@ -90,7 +90,7 @@ Price varies widely between farmers growing the same crop: crop type explains on
 
 - **Help farmers sell better, not just grow more.** Price explains the largest share of the profit gap (43%) and varies widely within the same crop. Link farmers to cooperatives, storage and direct buyers.
 - **Raise yields, starting with irrigation.** Yield explains 38% of the gap and irrigation is the only practice with a clear link to profit (+27% per acre).
-- **Work on both levers together.** Farms strong on both yield and price earn about 7× more per acre than farms weak on both.
+- **Match support to each farm's weaker lever.** Farms strong on both yield and price earn about 7× more per acre than farms weak on both. The two don't trade off, so help Volume Growers sell better and Premium Sellers grow more. Give Struggling farms help with both.
 - **Target pest control instead of spraying routinely**, since spraying shows no profit benefit on average.
 - **Trial CAN on matched plots before promoting it.** Its lead may come from which crops use it.
 - **Fix data capture before next season:** real production costs, who each farmer sold to and when, validated dates and standard county and crop lists.
