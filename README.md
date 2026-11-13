@@ -42,21 +42,32 @@ Profit is reported by 404 of the 500 farms. Median yield is 2,556 kg per acre.
 | Premium Sellers | Low | High | KES 215K |
 | Struggling | Low | Low | KES 80K |
 
-Being strong on just one earns about the same either way, so the jump only comes from having both. Yield per acre (r = 0.63) and market price (r = 0.66) are linked to profit per acre almost equally.
+Being strong on just one earns about the same either way, so the jump only comes from having both. Yield and price are unrelated (R² = 0.004): high-yield farms don't sell for less.
 
-### 2. Which farming practice makes a clear difference?
+### 2. How much do yield and price each matter?
+
+**About equally.** On the 331 farms with a known county and crop:
+
+| Lever | Pattern | R² | p-value |
+|---|---|---|---|
+| Price | KES 10/kg more → ~KES 24K more profit per acre | 0.43 | < 0.0001 |
+| Yield | 1,000 kg/acre more → ~KES 95K more profit per acre | 0.38 | < 0.0001 |
+
+Price varies widely between farmers growing the same crop: crop type explains only 2% of price differences. How and where farmers sell likely matters more than what they grow.
+
+### 3. Which farming practice makes a clear difference?
 
 **Irrigation.** Flood, sprinkler and drip all earn KES 275–283K per acre. Rain-fed farms earn KES 219K. The method matters little (about 3% apart), so the insight is to irrigate, not which system to use.
 
-### 3. Do fertiliser and pest control pay off?
+### 4. Do fertiliser and pest control pay off?
 
 **Not clearly.** CAN farms earn the most per acre, but farms using no fertiliser beat those using manure or urea. Farms with no pest control earn about the same as those using organic or chemical control.
 
-### 4. Where are the strongest and weakest areas?
+### 5. Where are the strongest and weakest areas?
 
 **Nyeri leads** on profit per acre (KES 326K) and **Kericho trails** (KES 186K). The crop × county heatmap shows where each crop does well, but most pairs hold only 1–5 farms, so single cells are leads to investigate, not conclusions.
 
-### 5. Does farm size matter?
+### 6. Does farm size matter?
 
 **No.** Bigger farms are not more productive per acre (r = −0.03).
 
@@ -77,11 +88,12 @@ Being strong on just one earns about the same either way, so the jump only comes
 
 ## Recommendations
 
-- **Make irrigation access the programme's first priority**, starting with rain-fed farms in the lowest-earning counties.
-- **Pair agronomy with market access.** Better yields alone or better prices alone lift profit modestly. Both together earn about 7× more per acre.
+- **Help farmers sell better, not just grow more.** Price explains the largest share of the profit gap (43%) and varies widely within the same crop. Link farmers to cooperatives, storage and direct buyers.
+- **Raise yields, starting with irrigation.** Yield explains 38% of the gap and irrigation is the only practice with a clear link to profit (+27% per acre).
+- **Work on both levers together.** Farms strong on both yield and price earn about 7× more per acre than farms weak on both.
 - **Target pest control instead of spraying routinely**, since spraying shows no profit benefit on average.
 - **Trial CAN on matched plots before promoting it.** Its lead may come from which crops use it.
-- **Fix data capture before next season:** real production costs, validated dates and standard county and crop lists.
+- **Fix data capture before next season:** real production costs, who each farmer sold to and when, validated dates and standard county and crop lists.
 
 ## Limitations
 
