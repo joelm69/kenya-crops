@@ -1,0 +1,72 @@
+// Raw Crops
+
+let
+  Source = Csv.Document(File.Contents("/Users/joelmathooko/Desktop/PROJECTS/Kenya Crops/Kenya_Crops_Dataset.csv"), [Delimiter = ",", Columns = 20, QuoteStyle = QuoteStyle.None]),
+  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+in
+  #"Promoted headers"
+
+// DQ Audit
+
+let
+  Source = Raw_crops,
+  #"Unpivoted other columns" = Table.UnpivotOtherColumns(Source, {"Farmer Name"}, "Attribute", "Value"),
+  #"Filtered rows" = Table.SelectRows(#"Unpivoted other columns", each ([Value] = "" or [Value] = "Error" or [Value] = "N/A")),
+  #"Grouped rows" = Table.Group(#"Filtered rows", {"Attribute", "Value"}, {{"Count", each Table.RowCount(_), Int64.Type}}),
+  #"Replaced value" = Table.ReplaceValue(#"Grouped rows", "", "(blank)", Replacer.ReplaceValue, {"Value"}),
+  #"Pivoted column" = Table.Pivot(Table.TransformColumnTypes(#"Replaced value", {{"Value", type text}}), List.Distinct(Table.TransformColumnTypes(#"Replaced value", {{"Value", type text}})[Value]), "Value", "Count", List.Sum),
+  #"Replaced value 1" = Table.ReplaceValue(#"Pivoted column", null, 0, Replacer.ReplaceValue, {"Error", "N/A", "(blank)"}),
+  #"Changed column type" = Table.TransformColumnTypes(#"Replaced value 1", {{"Error", Int64.Type}, {"(blank)", Int64.Type}, {"N/A", Int64.Type}})
+in
+  #"Changed column type"
+
+// Crops Clean
+
+let
+  Source = Raw_crops,
+  #"Replaced value" = Table.ReplaceValue(Source, "Error", "", Replacer.ReplaceText, {"Farmer Name", "County", "Crop Type", "Crop Variety", "Season", "Planted Area (Acres)", "Yield (Kg)", "Market Price (KES/Kg)", "Revenue (KES)", "Cost of Production (KES)", "Profit (KES)", "Planting Date", "Harvest Date", "Soil Type", "Irrigation Method", "Fertilizer Used", "Pest Control", "Weather Impact", "Farmer Contact", "Notes"}),
+  #"Replaced value 1" = Table.ReplaceValue(#"Replaced value", "N/A", "", Replacer.ReplaceText, {"Farmer Name", "County", "Crop Type", "Crop Variety", "Season", "Planted Area (Acres)", "Yield (Kg)", "Market Price (KES/Kg)", "Revenue (KES)", "Cost of Production (KES)", "Profit (KES)", "Planting Date", "Harvest Date", "Soil Type", "Irrigation Method", "Fertilizer Used", "Pest Control", "Weather Impact", "Farmer Contact", "Notes"}),
+  #"Replaced value 2" = Table.ReplaceValue(#"Replaced value 1", "", null, Replacer.ReplaceValue, {"Farmer Name", "County", "Crop Type", "Crop Variety", "Season", "Planted Area (Acres)", "Yield (Kg)", "Market Price (KES/Kg)", "Revenue (KES)", "Cost of Production (KES)", "Profit (KES)", "Planting Date", "Harvest Date", "Soil Type", "Irrigation Method", "Fertilizer Used", "Pest Control", "Weather Impact", "Farmer Contact", "Notes"}),
+  #"Replaced value 3" = Table.ReplaceValue(#"Replaced value 2", null, "Unknown", Replacer.ReplaceValue, {"County","Crop Type", "Crop Variety", "Season", "Soil Type", "Irrigation Method", "Fertilizer Used", "Pest Control", "Weather Impact"}),
+  #"Replaced value 4" = Table.ReplaceValue(#"Replaced value 3", null, "No Notes", Replacer.ReplaceValue, {"Notes"}),
+  #"Changed column type" = Table.TransformColumnTypes(#"Replaced value 4", {{"Planted Area (Acres)", type number}, {"Yield (Kg)", type number}, {"Market Price (KES/Kg)", Currency.Type}, {"Revenue (KES)", Currency.Type}, {"Cost of Production (KES)", Currency.Type}, {"Profit (KES)", Currency.Type}, {"Planting Date", type date}, {"Harvest Date", type date}}),
+  #"Added custom" = Table.TransformColumnTypes(Table.AddColumn(#"Changed column type", "Revenue Check ", each [#"Planted Area (Acres)"]*[#"Yield (Kg)"]*[#"Market Price (KES/Kg)"]-[#"Revenue (KES)"]), {{"Revenue Check ", type number}}),
+  #"Added custom 1" = Table.TransformColumnTypes(Table.AddColumn(#"Added custom", "Profit Check ", each [#"Revenue (KES)"]-[#"Cost of Production (KES)"]-[#"Profit (KES)"]), {{"Profit Check ", type number}}),
+  #"Renamed columns" = Table.RenameColumns(#"Added custom 1", {{"Profit Check ", "Profit Check"}}),
+  #"Added custom 2" = Table.TransformColumnTypes(Table.AddColumn(#"Renamed columns", "Revenue Recoverable", each [#"Revenue (KES)"] = null
+and [#"Planted Area (Acres)"] <> null
+and [#"Yield (Kg)"] <> null
+and [#"Market Price (KES/Kg)"] <> null), {{"Revenue Recoverable", type logical}}),
+  #"Added custom 3" = Table.TransformColumnTypes(Table.AddColumn(#"Added custom 2", "Profit Recoverable ", each [#"Profit (KES)"] = null
+and [#"Revenue (KES)"] <> null
+and [#"Cost of Production (KES)"] <> null), {{"Profit Recoverable ", type logical}}),
+  #"Removed columns" = Table.RemoveColumns(#"Added custom 3", {"Revenue Recoverable", "Profit Recoverable "}),
+  #"Added custom 4" = Table.TransformColumnTypes(Table.AddColumn(#"Removed columns", "Days to Harvest", each [Harvest Date] - [Planting Date]), {{"Days to Harvest", type duration}}),
+  #"Extracted days" = Table.TransformColumns(#"Added custom 4", {{"Days to Harvest", each Duration.Days(_), type nullable Int64.Type}}),
+  #"Removed columns 1" = Table.RemoveColumns(#"Extracted days", {"Revenue Check ", "Profit Check"}),
+  #"Added custom 5" = Table.TransformColumnTypes(Table.AddColumn(#"Removed columns 1", "Date Flag", each if [Days to Harvest] = null then "Missing date"
+else if [Days to Harvest] < 0 then "Harvest before planting"
+else if [Days to Harvest] < 60 then "Too short to be realistic"
+else "Valid"), {{"Date Flag", type text}}),
+  #"Renamed columns 1" = Table.RenameColumns(#"Added custom 5", {{"Yield (Kg)", "Yield (Kg/Acre)"}}),
+  #"Added custom 6" = Table.AddColumn(#"Renamed columns 1", "Total Yield (Kg)", each [#"Yield (Kg/Acre)"] * [#"Planted Area (Acres)"]),
+  #"Changed column type 1" = Table.TransformColumnTypes(#"Added custom 6", {{"Total Yield (Kg)", type number}}),
+  #"Inserted conditional column" = Table.AddColumn(#"Changed column type 1", "Region", each if [County] = "Nairobi" then "Central" else if [County] = "Kiambu" then "Central" else if [County] = "Nyeri" then "Central" else if [County] = "Meru" then "East" else if [County] = "Machakos" then "East" else if [County] = "Mombasa" then "East" else if [County] = "Nakuru" then "West" else if [County] = "Eldoret" then "West" else if [County] = "Kericho" then "West" else if [County] = "Kisumu" then "West" else "Unknown")
+in
+  #"Inserted conditional column"
+
+// Date 2023
+
+let
+    Source = List.Dates(#date(2023, 1, 1), 365, #duration(1, 0, 0, 0)),
+  #"Converted to table" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+  #"Renamed columns" = Table.RenameColumns(#"Converted to table", {{"Column1", "Date"}}),
+  #"Changed column type" = Table.TransformColumnTypes(#"Renamed columns", {{"Date", type date}}),
+  #"Inserted year" = Table.AddColumn(#"Changed column type", "Year", each Date.Year([Date]), type nullable number),
+  #"Inserted quarter" = Table.AddColumn(#"Inserted year", "Quarter", each Date.QuarterOfYear([Date]), type nullable number),
+  #"Inserted month" = Table.AddColumn(#"Inserted quarter", "Month", each Date.Month([Date]), type nullable number),
+  #"Inserted month name" = Table.AddColumn(#"Inserted month", "Month name", each Date.MonthName([Date]), type nullable text),
+  #"Inserted day name" = Table.AddColumn(#"Inserted month name", "Day name", each Date.DayOfWeekName([Date]), type nullable text),
+  #"Changed column type 1" = Table.TransformColumnTypes(#"Inserted day name", {{"Month", Int64.Type}, {"Quarter", Int64.Type}, {"Year", Int64.Type}})
+in
+    #"Changed column type 1"

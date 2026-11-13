@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <clipPath id="badge">
+      <circle cx="80" cy="80" r="64"/>
+    </clipPath>
+  </defs>
+  <circle cx="80" cy="80" r="64" fill="#1F5E3B"/>
+  <g clip-path="url(#badge)">
+    <circle cx="80" cy="74" r="22" fill="#E3A72F"/>
+    <path d="M0 98 Q80 78 160 98 L160 160 L0 160 Z" fill="#6BA368"/>
+    <path d="M0 114 Q80 94 160 114 L160 160 L0 160 Z" fill="#7A4E2D"/>
+    <path d="M0 128 Q80 110 160 128 L160 160 L0 160 Z" fill="#6BA368"/>
+    <path d="M0 142 Q80 126 160 142 L160 160 L0 160 Z" fill="#7A4E2D"/>
+  </g>
+  <path d="M80 122 L80 86" stroke="#F4F1E8" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M80 98 C66 98 58 88 58 76 C70 76 80 84 80 98 Z" fill="#F4F1E8"/>
+  <path d="M80 92 C94 92 104 82 104 68 C90 68 80 78 80 92 Z" fill="#F4F1E8"/>
+  <circle cx="80" cy="80" r="64" fill="none" stroke="#E3A72F" stroke-width="4"/>
+</svg>
